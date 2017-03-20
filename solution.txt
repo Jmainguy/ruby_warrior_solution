@@ -1,0 +1,57 @@
+class Player
+  def move_back(warrior)
+    @start = true
+    warrior.pivot!
+  end
+  def heal(warrior)
+    if @health != nil and @health > warrior.health
+      warrior.walk!(:backward)
+    else
+      if warrior.health < 20
+        warrior.rest!
+      else
+        @full_heal = nil
+      end
+    end
+  end
+  def fire_arrow(warrior)
+    spaces = warrior.look
+    if spaces[1].captive?
+      warrior.shoot!
+    end
+  end
+  def play_turn(warrior)
+    spaces = warrior.look
+    if spaces[0].stairs?
+      if @touched_base == nil
+        warrior.pivot!
+      else
+        warrior.walk!
+      end
+    elsif spaces[0].wall?
+      @touched_base = true
+      warrior.pivot!
+    elsif @start == nil
+      move_back(warrior)
+    elsif @full_heal == true
+      heal(warrior)
+    elsif spaces[0].captive?
+      warrior.rescue!
+    elsif spaces[0].enemy?
+      warrior.attack!
+    elsif spaces[1].captive?
+      warrior.walk!
+    elsif spaces[1].enemy?
+      warrior.shoot!
+    elsif spaces[2].captive?
+      warrior.walk!
+    elsif spaces[2].enemy?
+      warrior.shoot!
+    elsif warrior.health < 15
+      @full_heal = true
+    elsif @full_heal == nil
+      warrior.walk!
+    end
+    @health = warrior.health
+  end
+end
